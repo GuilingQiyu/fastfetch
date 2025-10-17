@@ -39,7 +39,7 @@ static const char* detectFrequency(FFCPUResult* cpu)
 
     FF_IOOBJECT_AUTO_RELEASE io_registry_entry_t entryDevice = IOServiceGetMatchingService(MACH_PORT_NULL, IOServiceNameMatching("pmgr"));
     if (!entryDevice)
-        return "IOServiceGetMatchingServices() failed";
+        return "IOServiceGetMatchingService() failed";
 
     if (!IOObjectConformsTo(entryDevice, "AppleARMIODevice"))
         return "\"pmgr\" should conform to \"AppleARMIODevice\"";
@@ -126,6 +126,7 @@ const char* ffDetectCPUImpl(const FFCPUOptions* options, FFCPUResult* cpu)
     if(cpu->coresOnline == 1)
         cpu->coresOnline = (uint16_t) ffSysctlGetInt("hw.activecpu", 1);
 
+    ffCPUDetectByCpuid(cpu);
     detectFrequency(cpu);
     if (options->showPeCoreCount) detectCoreCount(cpu);
 

@@ -9,7 +9,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "3rdparty/yyjson/yyjson.h"
+
+#ifdef FF_USE_SYSTEM_YYJSON
+    #include <yyjson.h>
+#else
+    #include "3rdparty/yyjson/yyjson.h"
+#endif
 
 #ifdef _WIN32
     // #include <shlwapi.h>
@@ -95,8 +100,17 @@ bool ffStrbufGetline(char** lineptr, size_t* n, FFstrbuf* buffer);
 void ffStrbufGetlineRestore(char** lineptr, size_t* n, FFstrbuf* buffer);
 bool ffStrbufRemoveDupWhitespaces(FFstrbuf* strbuf);
 bool ffStrbufMatchSeparatedNS(const FFstrbuf* strbuf, uint32_t compLength, const char* comp, char separator);
+bool ffStrbufMatchSeparatedIgnCaseNS(const FFstrbuf* strbuf, uint32_t compLength, const char* comp, char separator);
+bool ffStrbufSeparatedContainNS(const FFstrbuf* strbuf, uint32_t compLength, const char* comp, char separator);
+bool ffStrbufSeparatedContainIgnCaseNS(const FFstrbuf* strbuf, uint32_t compLength, const char* comp, char separator);
 
 int ffStrbufAppendUtf32CodePoint(FFstrbuf* strbuf, uint32_t codepoint);
+
+void ffStrbufAppendSInt(FFstrbuf* strbuf, int64_t value);
+void ffStrbufAppendUInt(FFstrbuf* strbuf, uint64_t value);
+// Appends a double value to the string buffer with the specified precision (0~15).
+// if `precision < 0`, let yyjson decide the precision
+void ffStrbufAppendDouble(FFstrbuf* strbuf, double value, int8_t precision, bool trailingZeros);
 
 FF_C_NODISCARD static inline FFstrbuf ffStrbufCreateA(uint32_t allocate)
 {
@@ -553,6 +567,36 @@ static inline bool ffStrbufMatchSeparatedS(const FFstrbuf* strbuf, const char* c
 static inline bool ffStrbufMatchSeparated(const FFstrbuf* strbuf, const FFstrbuf* comp, char separator)
 {
     return ffStrbufMatchSeparatedNS(strbuf, comp->length, comp->chars, separator);
+}
+
+static inline bool ffStrbufMatchSeparatedIgnCaseS(const FFstrbuf* strbuf, const char* comp, char separator)
+{
+    return ffStrbufMatchSeparatedIgnCaseNS(strbuf, (uint32_t) strlen(comp), comp, separator);
+}
+
+static inline bool ffStrbufMatchSeparatedIgnCase(const FFstrbuf* strbuf, const FFstrbuf* comp, char separator)
+{
+    return ffStrbufMatchSeparatedIgnCaseNS(strbuf, comp->length, comp->chars, separator);
+}
+
+static inline bool ffStrbufSeparatedContainS(const FFstrbuf* strbuf, const char* comp, char separator)
+{
+    return ffStrbufSeparatedContainNS(strbuf, (uint32_t) strlen(comp), comp, separator);
+}
+
+static inline bool ffStrbufSeparatedContain(const FFstrbuf* strbuf, const FFstrbuf* comp, char separator)
+{
+    return ffStrbufSeparatedContainNS(strbuf, comp->length, comp->chars, separator);
+}
+
+static inline bool ffStrbufSeparatedContainIgnCaseS(const FFstrbuf* strbuf, const char* comp, char separator)
+{
+    return ffStrbufSeparatedContainIgnCaseNS(strbuf, (uint32_t) strlen(comp), comp, separator);
+}
+
+static inline bool ffStrbufSeparatedContainIgnCase(const FFstrbuf* strbuf, const FFstrbuf* comp, char separator)
+{
+    return ffStrbufSeparatedContainIgnCaseNS(strbuf, comp->length, comp->chars, separator);
 }
 
 #define FF_STRBUF_AUTO_DESTROY FFstrbuf __attribute__((__cleanup__(ffStrbufDestroy)))

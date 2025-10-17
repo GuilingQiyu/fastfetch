@@ -39,6 +39,15 @@ static const FFlogo A[] = {
             FF_COLOR_FG_256 "36",
         },
     },
+    // Aeon
+    {
+        .names = {"AerynOS"},
+        .lines = FASTFETCH_DATATEXT_LOGO_AERYNOS,
+        .colors = {
+            FF_COLOR_FG_DEFAULT,
+            FF_COLOR_FG_MAGENTA,
+        },
+    },
     // Afterglow
     {
         .names = {"Afterglow"},
@@ -1548,6 +1557,15 @@ static const FFlogo E[] = {
         },
         .colorKeys = FF_COLOR_FG_DEFAULT,
         .colorTitle = FF_COLOR_FG_CYAN,
+    },
+    // EmperorOS
+    {
+        .names = {"Emperor"},
+        .lines = FASTFETCH_DATATEXT_LOGO_EMPEROROS,
+        .colors = {
+            FF_COLOR_FG_YELLOW,
+            FF_COLOR_FG_DEFAULT,
+        },
     },
     // EncryptOS
     {
@@ -3399,6 +3417,7 @@ static const FFlogo O[] = {
         .colors = {
             FF_COLOR_FG_MAGENTA,
             FF_COLOR_FG_CYAN,
+            FF_COLOR_FG_LIGHT_BLUE,
         },
     },
     // OmniOS
@@ -3988,6 +4007,15 @@ static const FFlogo P[] = {
             FF_COLOR_FG_WHITE,
         },
     },
+    // PrismLinux
+    {
+        .names = {"PrismLinux"},
+        .lines = FASTFETCH_DATATEXT_LOGO_PRISMLINUX,
+        .colors = {
+            FF_COLOR_FG_BLUE,
+            FF_COLOR_FG_BLUE,
+        },
+    },
     // LAST
     {},
 };
@@ -4369,6 +4397,16 @@ static const FFlogo S[] = {
             FF_COLOR_FG_RED,
         },
     },
+    // Secureblue
+    {
+        .names = {"secureblue"},
+        .lines = FASTFETCH_DATATEXT_LOGO_SECUREBLUE,
+        .colors = {
+            FF_COLOR_FG_BLUE,
+            FF_COLOR_FG_MAGENTA,
+            FF_COLOR_FG_DEFAULT,
+        },
+    },
     // Serpent OS
     {
         .names = {"Serpent OS"},
@@ -4606,16 +4644,6 @@ static const FFlogo S[] = {
             FF_COLOR_FG_WHITE,
         },
     },
-    // Starry
-    {
-        .names = {"Starry"},
-        .lines = FASTFETCH_DATATEXT_LOGO_STARRY,
-        .colors = {
-            FF_COLOR_FG_GREEN,
-        },
-        .colorKeys = FF_COLOR_FG_GREEN,
-        .colorTitle = FF_COLOR_FG_DEFAULT,
-    },
     // StockLinux
     {
         .names = {"Stock Linux"},
@@ -4767,6 +4795,16 @@ static const FFlogo T[] = {
         .colors = {
             FF_COLOR_FG_256 "39",
             FF_COLOR_FG_WHITE,
+        },
+    },
+    // TempleOS
+    {
+        .names = {"TempleOS"},
+        .lines = FASTFETCH_DATATEXT_LOGO_TEMPLEOS,
+        .colors = {
+            FF_COLOR_FG_YELLOW,
+            FF_COLOR_FG_RED,
+            FF_COLOR_FG_CYAN,
         },
     },
     // TileOS

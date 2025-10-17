@@ -2,6 +2,7 @@
 
 #include <ctype.h>
 #include <inttypes.h>
+#include <math.h>
 
 char* CHAR_NULL_PTR = "";
 
@@ -542,6 +543,87 @@ int64_t ffStrbufToSInt(const FFstrbuf* strbuf, int64_t defaultValue)
     return str_end == strbuf->chars ? defaultValue : (int64_t)result;
 }
 
+void ffStrbufAppendSInt(FFstrbuf* strbuf, int64_t value)
+{
+    ffStrbufEnsureFree(strbuf, 21); // Required by yyjson_write_number
+    char* start = strbuf->chars + strbuf->length;
+
+    yyjson_val val = {};
+    unsafe_yyjson_set_sint(&val, value);
+    char* end = yyjson_write_number(&val, start);
+
+    assert(end != NULL);
+
+    strbuf->length += (uint32_t)(end - start);
+}
+
+void ffStrbufAppendUInt(FFstrbuf* strbuf, uint64_t value)
+{
+    ffStrbufEnsureFree(strbuf, 21); // Required by yyjson_write_number
+    char* start = strbuf->chars + strbuf->length;
+
+    yyjson_val val = {};
+    unsafe_yyjson_set_uint(&val, value);
+    char* end = yyjson_write_number(&val, start);
+
+    assert(end != NULL);
+
+    strbuf->length += (uint32_t)(end - start);
+}
+
+void ffStrbufAppendDouble(FFstrbuf* strbuf, double value, int8_t precision, bool trailingZeros)
+{
+    assert(precision <= 15); // yyjson_write_number supports up to 15 digits after the decimal point
+
+    ffStrbufEnsureFree(strbuf, 40); // Required by yyjson_write_number
+    char* start = strbuf->chars + strbuf->length;
+
+    if (precision == 0)
+        value = round(value);
+    yyjson_val val = {};
+    unsafe_yyjson_set_double(&val, value);
+    if (precision > 0)
+        unsafe_yyjson_set_fp_to_fixed(&val, precision);
+
+    // Write at most <precision> digits after the decimal point; doesn't append trailing zeros
+    char* end = yyjson_write_number(&val, start);
+
+    assert(end > start);
+
+    strbuf->length += (uint32_t)(end - start);
+
+    if (__builtin_expect(value > 1e21 || value < -1e21, false))
+    {
+        // If the value is too large, yyjson_write_number will write it in scientific notation
+        return;
+    }
+
+    if (trailingZeros)
+    {
+        if (precision > 1)
+        {
+            for (char* p = end - 1; *p != '.' && p > start; --p)
+                --precision;
+            if (precision > 0)
+                ffStrbufAppendNC(strbuf, (uint32_t) precision, '0');
+        }
+        else if (precision == 0 || (precision < 0 && end[-1] == '0'))
+        {
+            goto removeDecimalPoint;
+        }
+    }
+    else
+    {
+        if (end[-1] == '0')
+        {
+        removeDecimalPoint:
+            // yyjson always appends ".0" to make it a float point number. We need to remove it
+            strbuf->length -= 2;
+            strbuf->chars[strbuf->length] = '\0';
+        }
+    }
+}
+
 void ffStrbufUpperCase(FFstrbuf* strbuf)
 {
     for (uint32_t i = 0; i < strbuf->length; ++i)
@@ -648,7 +730,7 @@ bool ffStrbufRemoveDupWhitespaces(FFstrbuf* strbuf)
     return changed;
 }
 
-/// @brief Check if a separated string contains a substring.
+/// @brief Check if a separated string (comp) contains a substring (strbuf).
 /// @param strbuf The substring to check.
 /// @param compLength The length of the separated string to check.
 /// @param comp The separated string to check.
@@ -669,6 +751,31 @@ bool ffStrbufMatchSeparatedNS(const FFstrbuf* strbuf, uint32_t compLength, const
 
         uint32_t substrLength = (uint32_t) (colon - p);
         if (strbuf->length == substrLength && memcmp(strbuf->chars, p, substrLength) == 0)
+            return true;
+
+        p = colon + 1;
+    }
+
+    return false;
+}
+
+/// @brief Case insensitive version of ffStrbufMatchSeparatedNS.
+bool ffStrbufMatchSeparatedIgnCaseNS(const FFstrbuf* strbuf, uint32_t compLength, const char* comp, char separator)
+{
+    if (strbuf->length == 0)
+        return true;
+
+    if (compLength == 0)
+        return false;
+
+    for (const char* p = comp; p < comp + compLength;)
+    {
+        const char* colon = memchr(p, separator, compLength);
+        if (colon == NULL)
+            return strcasecmp(strbuf->chars, p) == 0;
+
+        uint32_t substrLength = (uint32_t) (colon - p);
+        if (strbuf->length == substrLength && strncasecmp(strbuf->chars, p, substrLength) == 0)
             return true;
 
         p = colon + 1;
@@ -707,4 +814,43 @@ int ffStrbufAppendUtf32CodePoint(FFstrbuf* strbuf, uint32_t codepoint)
 
     ffStrbufAppendS(strbuf, "�"); // U+FFFD REPLACEMENT CHARACTER
     return 1;
+}
+
+/// @brief Check if a separated string (strbuf) contains a substring (comp).
+/// @param strbuf The separated to check.
+/// @param compLength The length of the separated string to check.
+/// @param comp The substring to check.
+/// @param separator The separator character.
+bool ffStrbufSeparatedContainNS(const FFstrbuf* strbuf, uint32_t compLength, const char* comp, char separator)
+{
+    uint32_t startIndex = 0;
+    while(startIndex < strbuf->length)
+    {
+        uint32_t colonIndex = ffStrbufNextIndexC(strbuf, startIndex, separator);
+
+        uint32_t folderLength = colonIndex - startIndex;
+        if (folderLength == compLength && memcmp(strbuf->chars + startIndex, comp, compLength) == 0)
+            return true;
+
+        startIndex = colonIndex + 1;
+    }
+
+    return false;
+}
+
+bool ffStrbufSeparatedContainIgnCaseNS(const FFstrbuf* strbuf, uint32_t compLength, const char* comp, char separator)
+{
+    uint32_t startIndex = 0;
+    while(startIndex < strbuf->length)
+    {
+        uint32_t colonIndex = ffStrbufNextIndexC(strbuf, startIndex, separator);
+
+        uint32_t folderLength = colonIndex - startIndex;
+        if (folderLength == compLength && strncasecmp(strbuf->chars + startIndex, comp, compLength) == 0)
+            return true;
+
+        startIndex = colonIndex + 1;
+    }
+
+    return false;
 }
