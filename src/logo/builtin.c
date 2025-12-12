@@ -39,7 +39,7 @@ static const FFlogo A[] = {
             FF_COLOR_FG_256 "36",
         },
     },
-    // Aeon
+    // AerynOS
     {
         .names = {"AerynOS"},
         .lines = FASTFETCH_DATATEXT_LOGO_AERYNOS,
@@ -179,6 +179,20 @@ static const FFlogo A[] = {
         .colors = {
             FF_COLOR_FG_WHITE,
             FF_COLOR_FG_256 "178",
+        }
+    },
+    // Amiga
+    {
+        .names = {"Amiga"},
+        .lines = FASTFETCH_DATATEXT_LOGO_AMIGA,
+        .colors = {
+            FF_COLOR_FG_RED,
+            FF_COLOR_FG_LIGHT_RED,
+            FF_COLOR_FG_YELLOW,
+            FF_COLOR_FG_BLUE,
+            FF_COLOR_FG_CYAN,
+            FF_COLOR_FG_LIGHT_YELLOW,
+            FF_COLOR_FG_GREEN,
         }
     },
     // AmogOS
@@ -2856,6 +2870,17 @@ static const FFlogo L[] = {
 };
 
 static const FFlogo M[] = {
+    // Macaroni
+    {
+        .names = {"Macaroni"},
+        .lines = FASTFETCH_DATATEXT_LOGO_MACARONIOS,
+        .colors = {
+            FF_COLOR_FG_YELLOW,
+            FF_COLOR_FG_WHITE,
+        },
+        .colorKeys = FF_COLOR_FG_YELLOW,
+        .colorTitle = FF_COLOR_FG_GREEN,
+    },
     // MacOS
     {
         .names = {"macos", "mac"},
@@ -3430,12 +3455,6 @@ static const FFlogo O[] = {
             FF_COLOR_FG_LIGHT_BLACK,
         }
     },
-    // Opak
-    {
-        .names = {"Opak"},
-        .lines = FASTFETCH_DATATEXT_LOGO_OPAK,
-        .colors = {}, // #1070
-    },
     // OpenKylin
     {
         .names = {"openkylin", "open-kylin"},
@@ -3674,6 +3693,15 @@ static const FFlogo O[] = {
             FF_COLOR_FG_DEFAULT,
             FF_COLOR_FG_DEFAULT,
         },
+    },
+    // OS/2 Warp
+    {
+        .names = {"OS2Warp"},
+        .lines = FASTFETCH_DATATEXT_LOGO_OS2WARP,
+        .colors = {
+            FF_COLOR_FG_LIGHT_WHITE,
+            FF_COLOR_FG_LIGHT_BLUE,
+        }
     },
     // OS_Elbrus
     {
@@ -5200,6 +5228,15 @@ static const FFlogo V[] = {
             FF_COLOR_FG_BLUE,
         },
     },
+    // VincentOS
+    {
+        .names = {"VincentOS"},
+        .lines = FASTFETCH_DATATEXT_LOGO_VINCENTOS,
+        .colors = {
+            FF_COLOR_FG_GREEN,
+            FF_COLOR_FG_DEFAULT,
+        },
+    },
     // Vnux
     {
         .names = {"Vnux"},
@@ -5488,6 +5525,16 @@ static const FFlogo Z[] = {
         .colors = {
             FF_COLOR_FG_BLUE,
         },
+    },
+    // Zraxyl
+    {
+        .names = {"Zraxyl" },
+        .lines = FASTFETCH_DATATEXT_LOGO_ZRAXYL,
+        .colors = {
+            FF_COLOR_FG_BLUE,
+        },
+        .colorKeys = FF_COLOR_FG_BLUE,
+        .colorTitle = FF_COLOR_FG_BLUE,
     },
     // LAST
     {},
